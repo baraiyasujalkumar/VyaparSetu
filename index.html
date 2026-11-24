@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>VyaparSetu - Small Business Panel</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <!-- TOAST CONTAINER -->
+        <div id="toastContainer"></div>
+        <!-- CONFIRM DIALOG -->
+        <div id="confirmOverlay" class="hidden">
+            <div class="confirm-box">
+                <div class="confirm-icon" id="confirmIcon">⚠️</div>
+                <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+                <div class="confirm-msg" id="confirmMsg"></div>
+                <div class="confirm-actions">
+                    <button class="btn btn-outline" onclick="resolveConfirm(false)">Cancel</button>
+                    <button class="btn btn-danger-solid" id="confirmOkBtn" onclick="resolveConfirm(true)">Confirm</button>
+                </div>
+            </div>
+        </div>
+        <!-- LOGIN SHELL -->
+        <div id="loginShell" class="auth-shell">
+            <div class="auth-main">
+                <div class="auth-brand">
+                    <div class="logo">V</div>
+                    <div>
+                        <div class="badge">VyaparSetu</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="auth-title" data-i18n="login_title">Smart Control for Your Daily Vyapar</div>
+                    <div class="auth-subtitle" data-i18n="login_subtitle">Designed for kirana, salons, tuition classes, repair shops and more.</div>
+                </div>
+                <!-- Auth tabs -->
+                <div style="display:flex;gap:0;border-radius:12px;background:#f3f4f6;padding:4px;margin-top:4px">
+                    <button type="button" id="tabSignIn" onclick="switchAuthTab('signin')" style="flex:1;padding:7px 0;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,0.3)">
+          Sign In
+        </button>
+                    <button type="button" id="tabSignUp" onclick="switchAuthTab('signup')" style="flex:1;padding:7px 0;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;background:transparent;color:#6b7280">
+          Sign Up
+        </button>
+                </div>
+                <!-- SIGN IN FORM -->
+                <form id="loginForm" class="auth-form" style="margin-top:8px">
+                    <div class="form-row">
+                        <label for="businessName">🏪 Business / Shop Name</label>
+                        <div style="position:relative">
+                            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none">🏪</span>
+                            <input id="businessName" class="input" type="text" maxlength="40" placeholder="e.g. Shree Ganesh Kirana" style="padding-left:32px" required/>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="pin">🔑 4-digit PIN</label>
+                        <div style="position:relative">
+                            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none">🔑</span>
+                            <input id="pin" class="input" type="password" pattern="\d{4}" maxlength="4" inputmode="numeric" placeholder="Enter 4-digit PIN" style="padding-left:32px" required/>
+                        </div>
+                        <small style="font-size:11px;color:#6b7280" data-i18n="pin_hint">
+                            Demo PIN is <strong>1234</strong>
+                        </small>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;gap:10px">
+                        <div class="form-row" style="flex:1">
+                            <label for="languageSelectLogin" data-i18n="label_language">🌐 Language</label>
+                            <select id="languageSelectLogin" class="input">
+                                <option value="en">English</option>
+                                <option value="hi">हिन्दी</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="align-self:flex-end;min-width:110px" data-i18n="btn_login">Sign In</button>
+                    </div>
+                </form>
+                <!-- SIGN UP FORM -->
+                <form id="signupForm" class="auth-form hidden" style="margin-top:8px">
+                    <div class="form-grid-2">
+                        <div class="form-row">
+                            <label>🏪 Shop Name</label>
+                            <div style="position:relative">
+                                <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none">🏪</span>
+                                <input id="signupShop" class="input" type="text" maxlength="40" placeholder="e.g. Raj Medical Store" style="padding-left:32px" required/>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <label>👤 Owner Name</label>
+                            <div style="position:relative">
+                                <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none">👤</span>
+                                <input id="signupOwner" class="input" type="text" maxlength="30" placeholder="e.g. Rajesh Kumar" style="padding-left:32px" required/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-grid-2" style="margin-top:8px">
+                        <div class="form-row">
+                            <label>🏷️ Shop Type</label>
+                            <div style="position:relative">
+                                <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none">🏷️</span>
+                                <select id="signupType" class="input" style="padding-left:32px">
+                                    <option value="kirana">🛒 Kirana / Grocery</option>
+                                    <option value="salon">✂️ Salon / Beauty</option>
+                                    <option value="tuition">📚 Tuition / Classes</option>
+                                    <option value="repair">🔧 Repair Shop</option>
+                                    <option value="medical">💊 Medical / Pharmacy</option>
+                                    <option value="restaurant">🍽️ Restaurant / Dhaba</option>
+                                    <option value="other">📦 Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <label>📱 Mobile Number</label>
+                            <div style="position:relative">
+                                <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none">📱</span>
+                                <input id="signupPhone" class="input" type="tel" maxlength="10" placeholder="e.g. 9876543210" style="padding-left:32px"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-grid-2" style="margin-top:8px">
+                        <div class="form-row">
+                            <label>🔑 Set 4-digit PIN</label>
+                            <div style="position:relative">
+                                <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none">🔑</span>
+                                <input id="signupPin" class="input" type="password" pattern="\d{4}" maxlength="4" inputmode="numeric" placeholder="Choose a PIN" style="padding-left:32px" required/>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <label>🔁 Confirm PIN</label>
+                            <div style="position:relative">
+                                <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none">🔁</span>
+                                <input id="signupPinConfirm" class="input" type="password" pattern="\d{4}" maxlength="4" inputmode="numeric" placeholder="Repeat PIN" style="padding-left:32px" required/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions" style="margin-top:10px">
+                        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+            🚀 Create My Shop Account
+          </button>
+                    </div>
+                    <div style="text-align:center;font-size:11px;color:#9ca3af;margin-top:6px">
+                        Already registered? <span style="color:#2563eb;cursor:pointer;font-weight:600" onclick="switchAuthTab('signin')">Sign In →</span>
+                    </div>
+                </form>
+                <div class="auth-footer">
+                    <span data-i18n="footer_note">No installation. Works on any phone / computer.</span>
+                    <span data-i18n="footer_region">Built for India 🇮🇳</span>
+                </div>
+            </div>
+            <aside class="auth-side">
+                <div class="auth-pill">
+                    <span>⚡</span>
+                    <span data-i18n="side_pill">Instant setup, under 30 seconds</span>
+                </div>
+                <div class="auth-hero-title" data-i18n="side_hero_title">Replace messy registers with one clean smart panel.</div>
+                <ul class="auth-points">
+                    <li data-i18n="side_p1">Make bills and share on WhatsApp.</li>
+                    <li data-i18n="side_p2">Track helper attendance & salary on-time.</li>
+                    <li data-i18n="side_p3">See today's sales, dues and cash in one place.</li>
+                </ul>
+                <div class="auth-kpi-row">
+                    <div class="auth-kpi-card">
+                        <div style="font-size:10px;color:#9ca3af" data-i18n="side_today">Today's billed amount</div>
+                        <div class="auth-kpi-value">₹8,430</div>
+                        <div style="font-size:10px;color:#bbf7d0">▲ 18% vs yesterday</div>
+                    </div>
+                    <div class="auth-kpi-card">
+                        <div style="font-size:10px;color:#9ca3af" data-i18n="side_dues">Pending customer dues</div>
+                        <div class="auth-kpi-value">₹3,250</div>
+                        <div style="font-size:10px;color:#fee2e2">7 customers to remind</div>
+                    </div>
+                </div>
+                <div class="auth-blur-circle"></div>
+            </aside>
+        </div>
+        <!-- APP SHELL -->
+        <div id="appShell" class="hidden">
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-brand">
+                        <div class="logo">V</div>
+                        <div class="sidebar-brand-text">
+                            <span>VyaparSetu</span>
+                            <span data-i18n="sidebar_tagline">Everyday control, one tap away</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-user">
+                    <span style="font-size:14px">👋</span>
+                    <span id="sidebarBusinessName">Your Business</span>
+                </div>
+                <div id="sidebarOwnerName" style="display:none;font-size:10px;color:#9ca3af;padding:0 4px 4px 8px"></div>
+                <nav class="sidebar-nav">
+                    <div class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
+                        <span class="icon">🏠</span>
+                        <span class="label" data-i18n="nav_dashboard">Dashboard</span>
+                    </div>
+                    <div class="nav-item" data-view="billing" onclick="switchView('billing')">
+                        <span class="icon">🧾</span>
+                        <span class="label" data-i18n="nav_billing">Billing</span>
+                    </div>
+                    <div class="nav-item" data-view="customers" onclick="switchView('customers')">
+                        <span class="icon">👥</span>
+                        <span class="label" data-i18n="nav_customers">Customers</span>
+                    </div>
+                    <div class="nav-item" data-view="helpers" onclick="switchView('helpers')">
+                        <span class="icon">🧑‍🔧</span>
+                        <span class="label" data-i18n="nav_helpers">Helpers</span>
+                    </div>
+                    <div class="nav-item" data-view="reports" onclick="switchView('reports')">
+                        <span class="icon">📊</span>
+                        <span class="label" data-i18n="nav_reports">Reports</span>
+                    </div>
+                    <div class="nav-item" data-view="settings" onclick="switchView('settings')">
+                        <span class="icon">⚙️</span>
+                        <span class="label" data-i18n="nav_settings">Settings</span>
+                    </div>
+                </nav>
+                <div class="sidebar-footer">
+                    <button class="btn-logout" type="button" onclick="logout()">
+                        <span>⏏</span>
+                        <span data-i18n="btn_logout">Logout</span>
+                    </button>
+                    <span data-i18n="version_label">v0.9 Prototype Preview</span>
+                </div>
+            </aside>
+            <main class="main">
+                <header class="top-bar">
+                    <div class="top-title">
+                        <h2 id="pageTitle">Dashboard</h2>
+                        <span id="pageSubtitle">Today at a glance.</span>
+                    </div>
+                    <div class="top-actions">
+                        <div class="pill-filter">
+                            <span style="font-size:12px">📅</span>
+                            <span data-i18n="filter_today">Today</span>
+                        </div>
+                        <button class="btn btn-outline" type="button" onclick="quickBillFromTop()" data-i18n="btn_quick_bill">+ Quick Bill</button>
+                        <div class="top-avatar" id="topAvatar">VS</div>
+                    </div>
+                </header>
+                <!-- DASHBOARD -->
+                <section class="content" id="view_dashboard">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <span>📈</span>
+                                    <span data-i18n="dash_today_overview">Today's business overview</span>
+                                </div>
+                                <div class="card-subtitle" data-i18n="dash_today_hint">Live view of bills, cash and helper status.</div>
+                            </div>
+                            <div class="card-header-right">
+                                <span class="chip-success chip">
+                                    <span>●</span> Live
+                                </span>
+                            </div>
+                        </div>
+                        <div class="stats-row">
+                            <div class="stat-card">
+                                <div class="stat-label" data-i18n="stat_total_sales">Total billed today</div>
+                                <div class="stat-value" id="statTotalSales">₹0</div>
+                                <div class="stat-trend up" id="statSalesCount">0 bills</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label" data-i18n="stat_cash_in_hand">Expected cash in hand</div>
+                                <div class="stat-value" id="statCashInHand">₹0</div>
+                                <div class="stat-trend" id="statPending">0 customers pending</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label" data-i18n="stat_helper">Helper attendance</div>
+                                <div class="stat-value" id="statHelperAttendance">0%</div>
+                                <div class="stat-trend" id="statHelperWage">₹0 due this month</div>
+                            </div>
+                        </div>
+                        <div style="margin-top:14px;font-size:12px">
+                            <span class="badge" data-i18n="dash_quick_actions">Quick actions</span>
+                            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                                <button class="btn btn-outline" type="button" onclick="switchView('billing')">
+                                    🧾 <span data-i18n="quick_make_bill">Make new bill</span>
+                                </button>
+                                <button class="btn btn-outline" type="button" onclick="switchView('helpers')">
+                                    ✅ <span data-i18n="quick_mark_attendance">Mark helper present</span>
+                                </button>
+                                <button class="btn btn-outline" type="button" onclick="switchView('customers')">
+                                    📲 <span data-i18n="quick_due_reminder">Due reminder list</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <span>🧾</span>
+                                    <span data-i18n="dash_recent_bills">Recent bills</span>
+                                </div>
+                                <div class="card-subtitle" data-i18n="dash_recent_hint">Last few bills you made today.</div>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th data-i18n="th_time">Time</th>
+                                        <th data-i18n="th_customer">Customer</th>
+                                        <th data-i18n="th_amount">Amount</th>
+                                        <th data-i18n="th_status">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentBillsBody">
+                                    <tr>
+                                        <td colspan="4" style="text-align:center;color:#9ca3af">
+                                            <span data-i18n="empty_no_bills">No bills yet.</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="margin-top:10px;padding:8px 10px;border-radius:12px;background:#eff6ff;border:1px dashed #bfdbfe;font-size:11px;display:flex;align-items:center;gap:8px">
+                            <span>💡</span>
+                            <span data-i18n="tip_share_whatsapp">Tip: Tap a bill to copy details for WhatsApp.</span>
+                        </div>
+                    </div>
+                </section>
+                <!-- BILLING -->
+                <section class="content hidden" id="view_billing">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <span>🧾</span>
+                                    <span data-i18n="billing_title">Create quick bill</span>
+                                </div>
+                                <div class="card-subtitle" data-i18n="billing_subtitle">Capture essentials only. More speed, less typing.</div>
+                            </div>
+                            <span class="badge" id="billIdBadge">#NEW</span>
+                        </div>
+                        <form id="billForm">
+                            <div class="form-grid-2">
+                                <div class="form-row">
+                                    <label data-i18n="label_customer_name">Customer name</label>
+                                    <input type="text" class="input" id="billCustomer" placeholder="e.g. Ramesh / Walk-in" required/>
+                                </div>
+                                <div class="form-row">
+                                    <label data-i18n="label_customer_phone">Phone (optional)</label>
+                                    <input type="tel" class="input" id="billPhone" maxlength="10" placeholder="e.g. 9876543210"/>
+                                </div>
+                            </div>
+                            <div class="form-grid-2" style="margin-top:8px">
+                                <div class="form-row">
+                                    <label data-i18n="label_item_summary">Items summary</label>
+                                    <textarea id="billItems" class="input" rows="2" placeholder="e.g. Rice 5kg, Oil 2L, Soap ×3"></textarea>
+                                </div>
+                                <div class="form-row">
+                                    <label data-i18n="label_total_amount">Total amount (₹)</label>
+                                    <input type="number" min="0" step="1" class="input" id="billAmount" placeholder="e.g. 250" required/>
+                                    <small style="font-size:11px;color:#6b7280">
+                                        <span data-i18n="label_discount">Discount (optional)</span>: <input style="width:70px;margin-left:4px;padding:2px 6px;border-radius:999px;border:1px solid #e5e7eb;font-size:11px" type="number" id="billDiscount" min="0" step="1" placeholder="0 ₹"/>
+                                        <span>₹</span>
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="form-grid-2" style="margin-top:8px">
+                                <div class="form-row">
+                                    <label data-i18n="label_payment_mode">Payment mode</label>
+                                    <select id="billPaymentMode" class="input">
+                                        <option value="cash" data-i18n="pm_cash">Cash</option>
+                                        <option value="upi" data-i18n="pm_upi">UPI</option>
+                                        <option value="card" data-i18n="pm_card">Card</option>
+                                        <option value="due" data-i18n="pm_due">Due / Udhar</option>
+                                    </select>
+                                </div>
+                                <div class="form-row">
+                                    <label data-i18n="label_bill_notes">Quick note</label>
+                                    <input type="text" class="input" id="billNote" placeholder="e.g. Paid full, deliver tomorrow"/>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-outline" onclick="resetBillForm()" data-i18n="btn_clear">Clear</button>
+                                <button type="submit" class="btn btn-primary" data-i18n="btn_save_bill">Save bill</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <span>📚</span>
+                                    <span data-i18n="billing_list_title">All bills today</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline" type="button" onclick="clearAllBills()" data-i18n="btn_clear_bills">Clear all</button>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th data-i18n="th_time">Time</th>
+                                        <th data-i18n="th_customer">Customer</th>
+                                        <th data-i18n="th_amount">Amount</th>
+                                        <th data-i18n="th_status">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="allBillsBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                <!-- CUSTOMERS -->
+                <section class="content hidden" id="view_customers">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <span>👥</span>
+                                    <span data-i18n="customers_title">Customer due tracker</span>
+                                </div>
+                                <div class="card-subtitle" data-i18n="customers_subtitle">Simple udhar list. Easy to call or message.</div>
+                            </div>
+                        </div>
+                        <form id="customerForm">
+                            <div class="form-grid-2">
+                                <div class="form-row">
+                                    <label data-i18n="label_customer_name">Customer name</label>
+                                    <input type="text" id="custName" class="input" required placeholder="e.g. Sharma Ji"/>
+                                </div>
+                                <div class="form-row">
+                                    <label data-i18n="label_customer_phone">Phone</label>
+                                    <input type="tel" id="custPhone" class="input" maxlength="10" placeholder="e.g. 9876543210"/>
+                                </div>
+                            </div>
+                            <div class="form-grid-2" style="margin-top:8px">
+                                <div class="form-row">
+                                    <label data-i18n="label_due_amount">Due amount (₹)</label>
+                                    <input type="number" id="custDue" min="0" step="1" class="input" placeholder="e.g. 500" required/>
+                                </div>
+                                <div class="form-row">
+                                    <label data-i18n="label_due_note">Note</label>
+                                    <input type="text" id="custNote" class="input" placeholder="e.g. Grocery bill, to be paid 1st"/>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary" data-i18n="btn_add_customer">Add / Update entry</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <span>📋</span>
+                                    <span data-i18n="customers_list_title">Due list</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline" type="button" onclick="clearCustomers()" data-i18n="btn_clear_customers">Clear</button>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th data-i18n="th_customer">Customer</th>
+                                        <th data-i18n="th_phone">Phone</th>
+                                        <th data-i18n="th_amount">Amount</th>
+                                        <th data-i18n="th_action">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customersBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                <!-- HELPERS -->
+                <section class="content hidden" id="view_helpers">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <span>🧑‍🔧</span>
+                                    <span data-i18n="helpers_title">Helper & staff</span>
+                                </div>
+                                <div class="card-subtitle" data-i18n="helpers_subtitle">One simple view to track attendance and monthly salary.</div>
+                            </div>
+                        </div>
+                        <form id="helperForm">
+                            <div class="form-grid-2">
+                                <div class="form-row">
+                                    <label data-i18n="label_helper_name">Helper name</label>
+                                    <input type="text" id="helperName" class="input" placeholder="e.g. Raju" required/>
+                                </div>
+                                <div class="form-row">
+                                    <label data-i18n="label_helper_salary">Monthly salary (₹)</label>
+                                    <input type="number" id="helperSalary" class="input" min="0" step="1" placeholder="e.g. 8000" required/>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary" data-i18n="btn_save_helper">Save helper</button>
+                            </div>
+                        </form>
+                        <div class="table-container" style="margin-top:8px">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th data-i18n="th_helper">Helper</th>
+                                        <th data-i18n="th_salary">Salary</th>
+                                        <th data-i18n="th_present_days">Present days</th>
+                                        <th data-i18n="th_estimate">Est. pay</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="helpersBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <span>✅</span>
+                                    <span data-i18n="helpers_attendance_title">Mark today's attendance</span>
+                                </div>
+                                <div class="card-subtitle" data-i18n="helpers_attendance_subtitle">Select a helper, then tap a date.</div>
+                            </div>
+                        </div>
+                        <div id="helperTabsContainer" style="margin-top:6px"></div>
+                        <div id="attendanceGrid" style="margin-top:4px"></div>
+                        <div class="attendance-legend">
+                            <span>
+                                <span class="attendance-day present" style="width:15px;height:15px"></span>
+                                <span data-i18n="legend_present">Present</span>
+                            </span>
+                            <span>
+                                <span class="attendance-day absent" style="width:15px;height:15px"></span>
+                                <span data-i18n="legend_absent">Absent</span>
+                            </span>
+                            <span>
+                                <span class="attendance-day" style="width:15px;height:15px"></span>
+                                <span data-i18n="legend_not_marked">Not marked</span>
+                            </span>
+                        </div>
+                    </div>
+                </section>
+                <!-- REPORTS -->
+                <section class="content hidden" id="view_reports">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <span>📊</span>
+                                    <span data-i18n="reports_title">Simple summary</span>
+                                </div>
+                                <div class="card-subtitle" data-i18n="reports_subtitle">High level view for your UI/UX presentation.</div>
+                            </div>
+                            <button class="btn btn-outline" style="font-size:11px;padding:5px 10px" onclick="forceRefreshReports()">🔄 Refresh</button>
+                        </div>
+                        <div style="display:grid;gap:10px">
+                            <div class="settings-row">
+                                <div>
+                                    <div style="font-size:13px;font-weight:600" data-i18n="reports_card_bills">Bills & revenue</div>
+                                    <div class="card-subtitle" id="reportsBillsLine">0 bills today</div>
+                                </div>
+                                <div class="chip">
+                                    <span>🧾</span>
+                                    <span id="reportsBillsTotal">₹0</span>
+                                </div>
+                            </div>
+                            <div class="settings-row">
+                                <div>
+                                    <div style="font-size:13px;font-weight:600" data-i18n="reports_card_customers">Customers on credit</div>
+                                    <div class="card-subtitle" id="reportsCustomersLine">0 customers owing money</div>
+                                </div>
+                                <div class="chip-warning chip">
+                                    <span>₹</span>
+                                    <span id="reportsCustomersTotal">₹0</span>
+                                </div>
+                            </div>
+                            <div class="settings-row">
+                                <div>
+                                    <div style="font-size:13px;font-weight:600" data-i18n="reports_card_helpers">Helper payout this month</div>
+                                    <div class="card-subtitle" id="reportsHelpersLine">0 helpers, 0 present days</div>
+                                </div>
+                                <div class="chip-success chip">
+                                    <span>👷</span>
+                                    <span id="reportsHelpersTotal">₹0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <span>🧪</span>
+                                    <span data-i18n="reports_demo_title">Prototype usage notes</span>
+                                </div>
+                            </div>
+                        </div>
+                        <ul style="font-size:12px;color:#4b5563;padding-left:16px">
+                            <li data-i18n="note_localstorage">All data is stored locally in the browser using localStorage.</li>
+                            <li data-i18n="note_frontend_only">This prototype is frontend-only (HTML, CSS, JS in one file).</li>
+                            <li data-i18n="note_multi_device">For multi-device sync, backend APIs can be added later.</li>
+                        </ul>
+                    </div>
+                </section>
+                <!-- SETTINGS -->
+                <section class="content hidden" id="view_settings">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <span>⚙️</span>
+                                    <span data-i18n="settings_title">Settings</span>
+                                </div>
+                                <div class="card-subtitle" data-i18n="settings_subtitle">Control language, billing defaults and privacy.</div>
+                            </div>
+                        </div>
+                        <div class="settings-row">
+                            <div>
+                                <div style="font-size:13px;font-weight:600" data-i18n="settings_language_title">App language</div>
+                                <div class="card-subtitle" data-i18n="settings_language_subtitle">Switch instantly between English and Hindi.</div>
+                            </div>
+                            <select id="languageSelectSettings" class="input" style="max-width:130px" onchange="changeLanguage(this.value)">
+                                <option value="en">English</option>
+                                <option value="hi">हिन्दी</option>
+                            </select>
+                        </div>
+                        <div class="settings-row">
+                            <div>
+                                <div style="font-size:13px;font-weight:600" data-i18n="settings_round_title">Round bill to nearest ₹1</div>
+                                <div class="card-subtitle" data-i18n="settings_round_subtitle">Helpful for cash only shops.</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="roundToggle" checked/>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="settings-row">
+                            <div>
+                                <div style="font-size:13px;font-weight:600" data-i18n="settings_darkmode_title">Focus mode (low noise)</div>
+                                <div class="card-subtitle" data-i18n="settings_darkmode_subtitle">Dim dashboard extras during peak hours.</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="focusToggle"/>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">
+                                    <span>🔒</span>
+                                    <span data-i18n="settings_security_title">Security & session</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:grid;gap:10px">
+                            <div class="settings-row">
+                                <div>
+                                    <div style="font-size:13px;font-weight:600" data-i18n="settings_autolock_title">Auto-lock after inactivity</div>
+                                    <div class="card-subtitle" data-i18n="settings_autolock_subtitle">For now, click Logout to simulate.</div>
+                                </div>
+                                <span class="badge">Demo</span>
+                            </div>
+                            <div class="settings-row">
+                                <div>
+                                    <div style="font-size:13px;font-weight:600" data-i18n="settings_reset_title">Reset all local data</div>
+                                    <div class="card-subtitle" data-i18n="settings_reset_subtitle">Clear bills, customers and helpers from this browser.</div>
+                                </div>
+                                <button class="btn btn-danger" type="button" onclick="resetAllData()" data-i18n="btn_reset_all">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+        <script src="script.js"></script>
+    </body>
+</html>
